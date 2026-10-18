@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home Maintenance BD</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1 data-i18n="title">Home Maintenance BD</h1>
+  <p class="subtitle" data-i18n="subtitle">Track household upkeep: service schedules, due dates and repair costs.</p>
+  <button id="langBtn" type="button">Bangla</button>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button type="button" data-tab="dashboard" class="active">Dashboard</button>
+  <button type="button" data-tab="tasks">Tasks</button>
+  <button type="button" data-tab="history">History</button>
+  <button type="button" data-tab="data">Data</button>
+</nav>
+
+<main>
+  <section id="tab-dashboard" class="tab active" aria-label="Dashboard">
+    <div class="cards">
+      <div class="card"><div class="k" data-i18n="dashTotal">Total tasks</div><div class="v" id="dTotal">0</div></div>
+      <div class="card"><div class="k" data-i18n="dashActive">Active</div><div class="v" id="dActive">0</div></div>
+      <div class="card warn"><div class="k" data-i18n="dashOverdue">Overdue</div><div class="v" id="dOverdue">0</div></div>
+      <div class="card"><div class="k" data-i18n="dashToday">Due today</div><div class="v" id="dToday">0</div></div>
+      <div class="card"><div class="k" data-i18n="dashSoon">Due in 7 days</div><div class="v" id="dSoon">0</div></div>
+      <div class="card"><div class="k" data-i18n="dashSpent">Spent (12 months)</div><div class="v" id="dSpent12">0</div></div>
+      <div class="card"><div class="k" data-i18n="dashSpentAll">Spent (all time)</div><div class="v" id="dSpentAll">0</div></div>
+      <div class="card wide"><div class="k" data-i18n="dashNext">Next due</div><div class="v small" id="dNext">Nothing scheduled</div></div>
+    </div>
+    <h2 data-i18n="perCat">Spend per category</h2>
+    <ul id="catSpend" class="plain"></ul>
+  </section>
+
+  <section id="tab-tasks" class="tab" aria-label="Tasks">
+    <form id="taskForm" novalidate>
+      <h2 data-i18n="addTask">Add task</h2>
+      <label><span data-i18n="name">Task name</span> <input id="fName" type="text" maxlength="80" required></label>
+      <label><span data-i18n="category">Category</span>
+        <select id="fCategory">
+          <option value="appliance">Appliance</option>
+          <option value="plumbing">Plumbing</option>
+          <option value="electrical">Electrical</option>
+          <option value="cleaning">Cleaning</option>
+          <option value="safety">Safety</option>
+          <option value="other">Other</option>
+        </select></label>
+      <label><span data-i18n="interval">Repeat every (days)</span> <input id="fInterval" type="number" min="0" max="3650" step="1" value="90"></label>
+      <p class="hint" data-i18n="intervalHint">0 = one-time task (use due date below).</p>
+      <label><span data-i18n="dueDate">Due date (one-time only)</span> <input id="fDue" type="date"></label>
+      <label><span data-i18n="lastDone">Last done (optional)</span> <input id="fLast" type="date"></label>
+      <label><span data-i18n="note">Note (optional)</span> <input id="fNote" type="text" maxlength="500"></label>
+      <p class="err" id="formError" role="alert"></p>
+      <button type="submit" data-i18n="save">Save task</button>
+      <button type="button" id="cancelEdit" data-i18n="cancel">Cancel</button>
+    </form>
+
+    <div class="filters">
+      <input id="searchInput" type="search" data-i18n-ph="search" placeholder="Search tasks">
+      <label><span data-i18n="filterStatus">Status</span>
+        <select id="filterStatus">
+          <option value="all">All</option>
+          <option value="overdue">Overdue</option>
+          <option value="due-today">Due today</option>
+          <option value="due-soon">Due soon</option>
+          <option value="ok">On track</option>
+          <option value="not-started">Not started</option>
+          <option value="done">Done</option>
+        </select></label>
+      <label><span data-i18n="filterCat">Category</span>
+        <select id="filterCat">
+          <option value="all">All</option>
+          <option value="appliance">Appliance</option>
+          <option value="plumbing">Plumbing</option>
+          <option value="electrical">Electrical</option>
+          <option value="cleaning">Cleaning</option>
+          <option value="safety">Safety</option>
+          <option value="other">Other</option>
+        </select></label>
+    </div>
+
+    <p id="noTasks" class="empty" data-i18n="emptyTasks">No tasks yet. Add your first maintenance task above.</p>
+    <ul id="taskList" class="tasks"></ul>
+  </section>
+
+  <section id="tab-history" class="tab" aria-label="History">
+    <h2 data-i18n="histTitle">Service history</h2>
+    <label><span data-i18n="histTask">Task</span> <select id="histTask"><option value="all">All</option></select></label>
+    <p id="histTotal"></p>
+    <p id="noHist" class="empty" data-i18n="emptyHist">No service records yet. Mark a task done to log it here.</p>
+    <ul id="histList" class="plain"></ul>
+  </section>
+
+  <section id="tab-data" class="tab" aria-label="Data">
+    <h2>Data</h2>
+    <button type="button" id="exportBtn" data-i18n="export">Export JSON</button>
+    <label class="file-label"><span data-i18n="import">Import JSON</span> <input id="importFile" type="file" accept="application/json,.json"></label>
+    <div class="erase">
+      <p data-i18n="eraseHint">Type DELETE to erase everything.</p>
+      <input id="eraseInput" type="text" autocomplete="off">
+      <button type="button" id="eraseBtn" data-i18n="erase">Erase all data</button>
+    </div>
+    <p id="dataMsg" role="status"></p>
+  </section>
+</main>
+
+<footer data-i18n="footer">Offline personal tracker. Dates and costs are your own records - not a contractor or warranty service.</footer>
+
+<script src="js/logic.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
